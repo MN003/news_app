@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:news_app/service/api_service.dart';
+
+import 'model/article1.dart';
 
 void main() {
   runApp(const MyApp());
@@ -29,13 +32,36 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  ApiService apiService = ApiService();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text("News API"),
       ),
-      body: const Text("Nimit"),
+      body: FutureBuilder(
+        future: apiService.getArticle(),
+        builder: (BuildContext context, AsyncSnapshot<List<Article>> snapshot){
+          if(snapshot.hasData){
+            return ListView.builder(
+                itemCount: snapshot.data!.length,
+                itemBuilder: (BuildContext context, int index){
+                  return Card(
+                    elevation: 15,
+                    child: ListTile(
+                      title: Text('${snapshot.data![index].title}'),
+                      // subtitle: Text('${snapshot.data![index].description}'),
+                      subtitle: Image.network('${snapshot.data![index].urlToImage}'),
+                    ),
+                  );
+                },
+            );
+          }
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        },
+      ),
     );
   }
 }
